@@ -31,9 +31,10 @@ import cz.msebera.android.httpclient.Header;
 
 public class WeatherController extends AppCompatActivity {
 
+    // Constants:
     //request_code
     final int REQUEST_CODE = 123;
-    // Constants:
+    // api URL
     final String WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather";
     // App ID to use OpenWeather data
     final String APP_ID = "bb251d1cf34e0533fa0b0b1eeb06fff2";
@@ -41,17 +42,15 @@ public class WeatherController extends AppCompatActivity {
     final long MIN_TIME = 5000;
     // Distance between location updates (1000m or 1km)
     final float MIN_DISTANCE = 1000;
-
-    // TODO: Set LOCATION_PROVIDER here:
+    // Set LOCATION_PROVIDER here:
     String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
-
 
     // Member Variables:
     TextView mCityLabel;
     ImageView mWeatherImage;
     TextView mTemperatureLabel;
 
-    // TODO: Declare a LocationManager and a LocationListener here:
+    // Declare a LocationManager and a LocationListener here:
     LocationManager mLocationManager;
     LocationListener mLocationListener;
 
@@ -68,7 +67,7 @@ public class WeatherController extends AppCompatActivity {
         ImageButton changeCityButton = (ImageButton) findViewById(R.id.changeCityButton);
 
 
-        // TODO: Add an OnClickListener to the changeCityButton here:
+        // Add an OnClickListener to the changeCityButton here:
         changeCityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,8 +78,12 @@ public class WeatherController extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("Clima", "onStart() Called");
+    }
 
-    // TODO: Add onResume() here:
     @Override
     protected void onResume() {
         super.onResume();
@@ -99,8 +102,30 @@ public class WeatherController extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("Clima", "onPause() called");
 
-    // TODO: Add getWeatherForNewCity(String city) here:
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(mLocationListener);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("Clima", "onStop() Called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("Clima", "onDestroy() Called");
+    }
+
+
+    // Add getWeatherForNewCity(String city) here:
     private void getWeatherForNewCity(String city) {
         RequestParams params = new RequestParams();
         params.put("q", city);
@@ -108,7 +133,7 @@ public class WeatherController extends AppCompatActivity {
         letsDoSomeNetworking(params);
     }
 
-    // TODO: Add getWeatherForCurrentLocation() here:
+    // Add getWeatherForCurrentLocation() here:
     private void getWeatherForCurrentLocation() {
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -132,12 +157,12 @@ public class WeatherController extends AppCompatActivity {
 
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
-
+                Log.d("Clima", "onStatusChanged() callback received");
             }
 
             @Override
             public void onProviderEnabled(String s) {
-
+                Log.d("Clima", "onProviderEnabled() callback received");
             }
 
             @Override
@@ -147,18 +172,12 @@ public class WeatherController extends AppCompatActivity {
         };
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
 
             return;
         }
+
         mLocationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
 
     }
@@ -177,7 +196,7 @@ public class WeatherController extends AppCompatActivity {
         }
     }
 
-    // TODO: Add letsDoSomeNetworking(RequestParams params) here:
+    // Add letsDoSomeNetworking(RequestParams params) here:
     private void letsDoSomeNetworking(RequestParams params) {
         AsyncHttpClient client = new AsyncHttpClient();
 
@@ -202,7 +221,7 @@ public class WeatherController extends AppCompatActivity {
     }
 
 
-    // TODO: Add updateUI() here:
+    // Add updateUI() here:
     private void updateUI(WeatherDataModel weather) {
         mTemperatureLabel.setText(weather.getTemperature());
         mCityLabel.setText(weather.getCity());
@@ -211,35 +230,4 @@ public class WeatherController extends AppCompatActivity {
         mWeatherImage.setImageResource(resourseID);
     }
 
-
-    // TODO: Add onPause() here:
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("Clima", "onPause() called");
-
-        if (mLocationManager != null) {
-            mLocationManager.removeUpdates(mLocationListener);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("Clima", "onStop() Called");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("Clima", "onStart() Called");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("Clima", "onDestroy() Called");
-    }
 }
