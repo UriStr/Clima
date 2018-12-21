@@ -3,6 +3,7 @@ package local.uri.clima;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -29,15 +30,17 @@ public class ChangeCityController extends AppCompatActivity {
         });
 
         editTextField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                Log.d("Clima", "OnEditorActionListener() callback");
 
                 String newCity = editTextField.getText().toString();
                 Intent newCityIntent = new Intent(ChangeCityController.this, WeatherController.class);
                 newCityIntent.putExtra("City", newCity);
                 startActivity(newCityIntent);
 
-                return false;
+                return true;
             }
         });
 

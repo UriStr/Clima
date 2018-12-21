@@ -43,7 +43,7 @@ public class WeatherController extends AppCompatActivity {
     // Distance between location updates (1000m or 1km)
     final float MIN_DISTANCE = 1000;
     // Set LOCATION_PROVIDER here:
-    String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
+    String LOCATION_PROVIDER = LocationManager.NETWORK_PROVIDER;
 
     // Member Variables:
     TextView mCityLabel;
@@ -94,6 +94,8 @@ public class WeatherController extends AppCompatActivity {
         if (city != null) {
             Log.d("Clima", "Getting weather for " + city + " city");
             getWeatherForNewCity(city);
+            myIntent = null;
+            city = null;
 
         } else {
             Log.d("Clima", "Getting weather for current location");
@@ -116,6 +118,8 @@ public class WeatherController extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         Log.d("Clima", "onStop() Called");
+
+
     }
 
     @Override
@@ -163,18 +167,25 @@ public class WeatherController extends AppCompatActivity {
             @Override
             public void onProviderEnabled(String s) {
                 Log.d("Clima", "onProviderEnabled() callback received");
+                if (mCityLabel.getText().toString().equals(getResources().getString(R.string.default_location))
+                        || mCityLabel.getText().toString().equals(getResources().getString(R.string.unable_to_find_text))) {
+                    getWeatherForCurrentLocation();
+                }
             }
 
             @Override
             public void onProviderDisabled(String s) {
                 Log.d("Clima", "onProviderDisabled() callback received");
+                if (mCityLabel.getText().toString().equals(getResources().getString(R.string.default_location))) {
+                    mCityLabel.setText(R.string.unable_to_find_text);
+                    Toast.makeText(getApplicationContext(), "Turn on location service or enter a city", Toast.LENGTH_LONG).show();
+                }
             }
         };
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
-
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
             return;
         }
 
@@ -215,6 +226,7 @@ public class WeatherController extends AppCompatActivity {
                 Log.e("Clima", "Fail " + e.toString());
                 Log.d("Clima", "Status code" + statusCode);
                 Toast.makeText(WeatherController.this, "Request Failed", Toast.LENGTH_SHORT).show();
+                mCityLabel.setText(R.string.try_again_city_text);
             }
 
         });

@@ -7,5 +7,7 @@
     <string name="back_button_description">Dismiss Change City Screen</string>
     <string name="get_weather">Change City</string>
     <string name="default_query">Enter city name</string>
+    <string name="unable_to_find_text">Unable to find your location</string>
+    <string name="try_again_city_text">Unable to find entered city, please try again</string>
 
 </resources>
